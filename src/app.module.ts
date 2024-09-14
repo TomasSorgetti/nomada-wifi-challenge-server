@@ -7,6 +7,7 @@ import { UsersModule } from './domains/users/users.module';
 import { AuthModule } from './domains/auth/auth.module';
 import databaseConfig from './config/database.config'; // Importa la configuración de base de datos
 import { DatabaseModule } from './database/database.module';
+import { RolesModule } from './domains/roles/roles.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { DatabaseModule } from './database/database.module';
     DatabaseModule,
     UsersModule,
     AuthModule,
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
