@@ -16,8 +16,8 @@ export class RolesService {
   async getAllRoles() {
     return await this.rolesRepository.find();
   }
-  getRoleById() {
-    return 'NOT_IMPLEMENTED';
+  async findRoleByName(roleName: string) {
+    return await this.rolesRepository.findOne({ where: { name: roleName } });
   }
   updateRole() {
     return 'NOT_IMPLEMENTED';

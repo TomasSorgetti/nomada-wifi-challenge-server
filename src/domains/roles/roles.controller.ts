@@ -15,12 +15,6 @@ export class RolesController {
   getAllRoles() {
     return this.rolesService.getAllRoles();
   }
-
-  @Get(':id')
-  getRoleById() {
-    return this.rolesService.getRoleById();
-  }
-
   @Patch()
   updateRole() {
     return this.rolesService.updateRole();
