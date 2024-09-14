@@ -1,34 +1,44 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../users/entities/users.entity';
-import { Repository } from 'typeorm';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PasswordService } from 'src/common/services/password.service';
-import { Role } from '../roles/entities/roles.entity';
-import { CreateUserDto } from '../users/dto/users.create.dto';
 import { UsersService } from '../users/users.service';
+import { JwtService } from 'src/common/services/jwt.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UsersService,
     private readonly passwordService: PasswordService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async login(email: string, password: string) {
+    //* Find user
     const foundUser = await this.userService.getUserByEmail(email);
     if (!foundUser) {
       throw new BadRequestException('User not found');
     }
-
+    //* Compare password
     const isPasswordValid = await this.passwordService.comparePassword(
       password,
       foundUser.password,
     );
     if (!isPasswordValid) {
-      throw new BadRequestException('Invalid password');
+      throw new UnauthorizedException('Invalid password');
     }
-    
+    //* Generate token
+    const accessToken = this.jwtService.generateToken({
+      email: foundUser.email,
+    });
+    //* Remove password and return data
+    const userWithoutSensitiveData = { ...foundUser };
+    delete userWithoutSensitiveData.password;
+    return { accessToken, user: userWithoutSensitiveData };
   }
+
   async register(email: string, password: string) {
     const foundUser = await this.userService.getUserByEmail(email);
     if (foundUser) {
@@ -44,7 +54,10 @@ export class AuthService {
   async refresh() {
     return 'NOT_IMPLEMENTED';
   }
-  me() {
-    return 'NOT_IMPLEMENTED';
+  async me(user: { email: string }) {
+    const foundUser = await this.userService.getUserByEmail(user.email);
+    const userWithoutSensitiveData = { ...foundUser };
+    delete userWithoutSensitiveData.password;
+    return userWithoutSensitiveData;
   }
 }
