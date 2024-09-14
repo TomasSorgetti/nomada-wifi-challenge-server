@@ -6,10 +6,25 @@ import { User } from '../users/entities/users.entity';
 import { PasswordService } from 'src/common/services/password.service';
 import { Role } from '../roles/entities/roles.entity';
 import { UsersModule } from '../users/users.module';
+import { JwtService } from 'src/common/services/jwt.service';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthGuard } from './guard/auth.guard';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Role]), UsersModule],
+  imports: [
+    TypeOrmModule.forFeature([User, Role]),
+    UsersModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('jwt.secret'),
+        signOptions: { expiresIn: configService.get<string>('jwt.expiresIn') },
+      }),
+    }),
+  ],
   controllers: [AuthController],
-  providers: [AuthService, PasswordService],
+  providers: [AuthService, PasswordService, JwtService, AuthGuard],
 })
 export class AuthModule {}
