@@ -1,5 +1,5 @@
 # TODO => How to Start
-
+# TODO => crear index config, y buscar como separar la conn con la db
 ## Arquitectura
 
 ¿Por qué una arquitectura basada en dominios?
