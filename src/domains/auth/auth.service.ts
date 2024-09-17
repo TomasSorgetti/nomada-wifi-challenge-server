@@ -18,7 +18,16 @@ export class AuthService {
     private readonly sensitiveUserService: SensitiveUserService,
   ) {}
 
-  async login(email: string, password: string, res: Response) {
+  /**
+   * Servicio para iniciar sesion
+   * @param email
+   * @param password
+   * @returns
+   */
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ accessToken: string; refreshToken: string; user: any }> {
     //* Find user
     const foundUser = await this.userService.getUserByEmail(email);
     if (!foundUser) {
@@ -41,19 +50,19 @@ export class AuthService {
     const accessToken = await this.jwtService.generateAccessToken(payload);
     const refreshToken = await this.jwtService.generateRefreshToken(payload);
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      //* secure en produccion es true, se debería de cambiar desde el process.env.NODE_ENV === 'production'
-      secure: false,
-      //* sameSite en produccion debería ser strict dependiendo del dominio
-      sameSite: 'lax',
-    });
     return {
       accessToken,
+      refreshToken,
       user: this.sensitiveUserService.getUserWithoutSensitiveData(foundUser),
     };
   }
 
+  /**
+   * Servicio para registrar un usuario
+   * @param email
+   * @param password
+   * @returns
+   */
   async register(email: string, password: string) {
     const foundUser = await this.userService.getUserByEmail(email);
     if (foundUser) {
@@ -64,6 +73,12 @@ export class AuthService {
     const user = await this.userService.createUser(email, hashedPassword);
     return this.sensitiveUserService.getUserWithoutSensitiveData(user);
   }
+
+  /**
+   * Servicio para cerrar sesion
+   * @param res
+   * @returns
+   */
   async logout(res: Response): Promise<{ message: string }> {
     res.cookie('refreshToken', '', {
       httpOnly: true,
@@ -73,6 +88,13 @@ export class AuthService {
     });
     return { message: 'Logout successful' };
   }
+
+  /**
+   * Servicio para refrescar el refreshToken
+   * @param user
+   * @param res
+   * @returns
+   */
   async refreshTokens(user: any, res: Response) {
     const payload = { email: user.email, sub: user.id };
     const accessToken = this.jwtService.generateAccessToken(payload);
@@ -88,6 +110,12 @@ export class AuthService {
 
     return { accessToken };
   }
+
+  /**
+   * Servicio para obtener el usuario cuando está autenticado
+   * @param user
+   * @returns
+   */
   async me(user: { id: number }) {
     //* Buscar por id es más rápido que buscar por email
     const foundUser = await this.userService.getUserByPk(user.id);
