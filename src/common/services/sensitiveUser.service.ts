@@ -12,6 +12,11 @@ export interface IUserSensitive {
 export class SensitiveUserService {
   constructor() {}
 
+  /**
+   * Servicio que devuelve el usuario sin la contraseña u otras propiedades sensibles
+   * @param user
+   * @returns
+   */
   getUserWithoutSensitiveData(user: IUser): IUserSensitive {
     const userWithoutSensitiveData = { ...user };
     delete userWithoutSensitiveData.password;
