@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { RoleDto } from './dto/roles.dto';
 
@@ -15,11 +15,13 @@ export class RolesController {
   getAllRoles() {
     return this.rolesService.getAllRoles();
   }
+
   @Patch()
   updateRole() {
     return this.rolesService.updateRole();
   }
 
+  @Delete('')
   deleteRole() {
     return this.rolesService.deleteRole();
   }
