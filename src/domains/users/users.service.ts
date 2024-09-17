@@ -17,6 +17,9 @@ export class UsersService {
   getUserByEmail(email: string) {
     return this.usersRepository.findOne({ where: { email, deletedAt: null } });
   }
+  getUserByPk(id: number) {
+    return this.usersRepository.findOne({ where: { id, deletedAt: null } });
+  }
   getUsers() {
     return 'NOT_IMPLEMENTED';
   }

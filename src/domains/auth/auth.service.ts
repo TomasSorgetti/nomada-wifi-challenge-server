@@ -7,6 +7,7 @@ import { PasswordService } from 'src/common/services/password.service';
 import { UsersService } from '../users/users.service';
 import { JwtService } from 'src/common/services/jwt.service';
 import { SensitiveUserService } from 'src/common/services/sensitiveUser.service';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,7 @@ export class AuthService {
     private readonly sensitiveUserService: SensitiveUserService,
   ) {}
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string, res: Response) {
     //* Find user
     const foundUser = await this.userService.getUserByEmail(email);
     if (!foundUser) {
@@ -31,9 +32,21 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');
     }
-    //* Generate token
-    const accessToken = this.jwtService.generateToken({
+
+    //* Generate tokens
+    const payload = {
       email: foundUser.email,
+      sub: foundUser.id,
+    };
+    const accessToken = await this.jwtService.generateAccessToken(payload);
+    const refreshToken = await this.jwtService.generateRefreshToken(payload);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      //* secure en produccion es true, se debería de cambiar desde el process.env.NODE_ENV === 'production'
+      secure: false,
+      //* sameSite en produccion debería ser strict dependiendo del dominio
+      sameSite: 'lax',
     });
     return {
       accessToken,
@@ -51,14 +64,33 @@ export class AuthService {
     const user = await this.userService.createUser(email, hashedPassword);
     return this.sensitiveUserService.getUserWithoutSensitiveData(user);
   }
-  async logout() {
-    return 'NOT_IMPLEMENTED';
+  async logout(res: Response): Promise<{ message: string }> {
+    res.cookie('refreshToken', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      expires: new Date(0),
+    });
+    return { message: 'Logout successful' };
   }
-  async refresh() {
-    return 'NOT_IMPLEMENTED';
+  async refreshTokens(user: any, res: Response) {
+    const payload = { email: user.email, sub: user.id };
+    const accessToken = this.jwtService.generateAccessToken(payload);
+    const refreshToken = await this.jwtService.generateRefreshToken(payload);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      //* secure en produccion es true, se debería de cambiar desde el process.env.NODE_ENV === 'production'
+      secure: false,
+      //* sameSite en produccion debería ser strict dependiendo del dominio
+      sameSite: 'lax',
+    });
+
+    return { accessToken };
   }
-  async me(user: { email: string }) {
-    const foundUser = await this.userService.getUserByEmail(user.email);
+  async me(user: { id: number }) {
+    //* Buscar por id es más rápido que buscar por email
+    const foundUser = await this.userService.getUserByPk(user.id);
     return this.sensitiveUserService.getUserWithoutSensitiveData(foundUser);
   }
 }

@@ -5,10 +5,9 @@ import { AppService } from './app.service';
 import { UsersModule } from './domains/users/users.module';
 import { AuthModule } from './domains/auth/auth.module';
 import databaseConfig from './config/database.config';
-import jwtConfig from './config/jwt.config';
 import { DatabaseModule } from './database/database.module';
 import { RolesModule } from './domains/roles/roles.module';
-
+import jwtConfig from './config/jwt.config';
 @Module({
   imports: [
     ConfigModule.forRoot({

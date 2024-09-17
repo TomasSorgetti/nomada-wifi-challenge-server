@@ -9,8 +9,8 @@ import { UsersModule } from '../users/users.module';
 import { JwtService } from 'src/common/services/jwt.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthGuard } from './guard/auth.guard';
 import { SensitiveUserService } from 'src/common/services/sensitiveUser.service';
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -20,8 +20,10 @@ import { SensitiveUserService } from 'src/common/services/sensitiveUser.service'
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('jwt.secret'),
-        signOptions: { expiresIn: configService.get<string>('jwt.expiresIn') },
+        secret: configService.get<string>('jwt.accessSecret'),
+        signOptions: {
+          expiresIn: configService.get<string>('jwt.accessTokenExpiration'),
+        },
       }),
     }),
   ],
@@ -31,7 +33,7 @@ import { SensitiveUserService } from 'src/common/services/sensitiveUser.service'
     PasswordService,
     SensitiveUserService,
     JwtService,
-    AuthGuard,
+    JwtAuthGuard,
   ],
 })
 export class AuthModule {}
