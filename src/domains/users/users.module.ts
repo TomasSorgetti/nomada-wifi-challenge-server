@@ -4,7 +4,6 @@ import { UsersService } from './users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/users.entity';
 import { RolesModule } from '../roles/roles.module';
-import { AuthGuard } from '../auth/guard/auth.guard';
 import { JwtService } from 'src/common/services/jwt.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -24,7 +23,7 @@ import { PasswordService } from 'src/common/services/password.service';
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, PasswordService, JwtService, AuthGuard],
+  providers: [UsersService, PasswordService, JwtService],
   exports: [UsersService],
 })
 export class UsersModule {}

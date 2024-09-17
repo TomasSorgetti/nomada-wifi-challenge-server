@@ -35,7 +35,11 @@
     │   ├── decorators/
     │   ├── filters/
     │   ├── interceptors/
-    │   └── pipes/
+    │   ├── pipes/
+    │   └── services/
+    │       ├── jwt.service.ts
+    │       ├── password.service.ts
+    │       └── sensitiveUser.service.ts
     │
     ├── app.module.ts
     └── main.ts
