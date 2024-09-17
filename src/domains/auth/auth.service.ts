@@ -6,6 +6,7 @@ import {
 import { PasswordService } from 'src/common/services/password.service';
 import { UsersService } from '../users/users.service';
 import { JwtService } from 'src/common/services/jwt.service';
+import { SensitiveUserService } from 'src/common/services/sensitiveUser.service';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
     private readonly userService: UsersService,
     private readonly passwordService: PasswordService,
     private readonly jwtService: JwtService,
+    private readonly sensitiveUserService: SensitiveUserService,
   ) {}
 
   async login(email: string, password: string) {
@@ -33,10 +35,10 @@ export class AuthService {
     const accessToken = this.jwtService.generateToken({
       email: foundUser.email,
     });
-    //* Remove password and return data
-    const userWithoutSensitiveData = { ...foundUser };
-    delete userWithoutSensitiveData.password;
-    return { accessToken, user: userWithoutSensitiveData };
+    return {
+      accessToken,
+      user: this.sensitiveUserService.getUserWithoutSensitiveData(foundUser),
+    };
   }
 
   async register(email: string, password: string) {
@@ -46,7 +48,8 @@ export class AuthService {
     }
     const hashedPassword = await this.passwordService.hashPassword(password);
 
-    return await this.userService.createUser(email, hashedPassword);
+    const user = await this.userService.createUser(email, hashedPassword);
+    return this.sensitiveUserService.getUserWithoutSensitiveData(user);
   }
   async logout() {
     return 'NOT_IMPLEMENTED';
@@ -56,8 +59,6 @@ export class AuthService {
   }
   async me(user: { email: string }) {
     const foundUser = await this.userService.getUserByEmail(user.email);
-    const userWithoutSensitiveData = { ...foundUser };
-    delete userWithoutSensitiveData.password;
-    return userWithoutSensitiveData;
+    return this.sensitiveUserService.getUserWithoutSensitiveData(foundUser);
   }
 }
