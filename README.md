@@ -1,5 +1,6 @@
 # TODO => How to Start
 # TODO => crear index config, y buscar como separar la conn con la db
+# TODO => roles debería ser una lista no un solo valor
 ## Arquitectura
 
 ¿Por qué una arquitectura basada en dominios?
