@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Post,
   Req,
   Res,
@@ -18,26 +19,58 @@ import { RefreshTokenDto } from './dto/refreshToken.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  /**
+   * Controlador para iniciar sesion
+   * @param newUser
+   * @param res
+   * @returns
+   */
   @Post('login')
-  login(
+  async login(
     @Body() newUser: LoginUserDto,
     @Res()
     res: Response,
   ) {
-    return this.authService.login(newUser.email, newUser.password, res);
+    const { accessToken, refreshToken, user } = await this.authService.login(
+      newUser.email,
+      newUser.password,
+    );
+    // res.cookie('refreshToken', refreshToken, {
+    //   httpOnly: true,
+    //   secure: false,
+    //   sameSite: 'lax',
+    // });
+    return res.status(HttpStatus.OK).json({ accessToken, refreshToken, user });
   }
 
+  /**
+   * Controlador para registrar un usuario
+   * @param newUser
+   * @returns
+   */
   @Post('register')
   register(@Body() newUser: RegisterUserDto) {
     return this.authService.register(newUser.email, newUser.password);
   }
 
+  /**
+   * Controlador para cerrar sesion
+   * @param res
+   * @returns
+   */
   @Post('logout')
-  @UseGuards(JwtAuthGuard) 
+  @UseGuards(JwtAuthGuard)
   async logout(@Res({ passthrough: true }) res: Response) {
     return await this.authService.logout(res);
   }
 
+  /**
+   * Controlador para refrescar el refreshToken
+   * @param refreshTokenDto
+   * @param req
+   * @param res
+   * @returns
+   */
   @Post('refresh')
   async refresh(
     @Body() refreshTokenDto: RefreshTokenDto,
@@ -47,6 +80,11 @@ export class AuthController {
     return await this.authService.refreshTokens(req.cookies.refreshToken, res);
   }
 
+  /**
+   * Cotrolador para obtener los datos del usuario cuando esta autenticado
+   * @param req
+   * @returns
+   */
   @Get('me')
   @UseGuards(JwtAuthGuard)
   me(
