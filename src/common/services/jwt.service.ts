@@ -13,16 +13,14 @@ export class JwtService {
     private readonly configService: ConfigService,
   ) {}
 
-  generateToken(user: any, secret: string, expiresIn = '7d'): Promise<string> {
-    const { email, id } = user;
-    return this.jwtService.signAsync(
-      { email, id },
-      {
-        secret,
-        expiresIn,
-      },
-    );
-  }
+  //TODO => Tal vez conviene crear un único metodo para la
+  //TODO => creacion de access y refresh tokens
+
+  /**
+   * Servicio para generar un access token
+   * @param payload
+   * @returns
+   */
   async generateAccessToken(payload: IUserPayload) {
     return this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('jwt.accessSecret'), // Acceso desde config
@@ -30,6 +28,11 @@ export class JwtService {
     });
   }
 
+  /**
+   * Servicio para generar un refresh token
+   * @param payload
+   * @returns
+   */
   async generateRefreshToken(payload: IUserPayload) {
     return this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('jwt.refreshSecret'), // Secreto para refresh token
@@ -37,10 +40,20 @@ export class JwtService {
     });
   }
 
+  /**
+   * Servicio para verificar un token
+   * @param token
+   * @returns
+   */
   verifyToken(token: string): any {
     return this.jwtService.verify(token);
   }
 
+  /**
+   * Servicio para decodificar un token
+   * @param token
+   * @returns
+   */
   decodeToken(token: string): any {
     return this.jwtService.decode(token);
   }
