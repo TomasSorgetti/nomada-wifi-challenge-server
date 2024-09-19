@@ -11,9 +11,9 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/registerUser.dto';
 import { LoginUserDto } from './dto/loginUser.dto';
-import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { Response, Request } from 'express';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -55,9 +55,10 @@ export class AuthController {
    * @returns
    */
   @Post('logout')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   async logout(@Res({ passthrough: true }) res: Response) {
-    return await this.authService.logout(res);
+    const response = await this.authService.logout(res);
+    res.status(HttpStatus.OK).json(response);
   }
 
   /**
@@ -84,6 +85,10 @@ export class AuthController {
     @Req()
     req,
   ) {
+    console.log('REQUEST ME!!!!!', req);
+
     return this.authService.me(req.user);
   }
+
+  //TODO => debería de hacer el delete en auth o users
 }
