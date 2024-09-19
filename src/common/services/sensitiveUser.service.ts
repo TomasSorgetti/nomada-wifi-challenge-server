@@ -1,12 +1,8 @@
 import { Injectable } from '@nestjs/common';
-
-export interface IUser {
-  email: string;
-  password: string;
-}
-export interface IUserSensitive {
-  email: string;
-}
+import {
+  IUserSensitive,
+  IUserwithoutSensitiveData,
+} from '../interfaces/sensitiveUser.interfaces';
 
 @Injectable()
 export class SensitiveUserService {
@@ -17,10 +13,10 @@ export class SensitiveUserService {
    * @param user
    * @returns
    */
-  getUserWithoutSensitiveData(user: IUser): IUserSensitive {
+  getUserWithoutSensitiveData(user: IUserwithoutSensitiveData): IUserSensitive {
     const userWithoutSensitiveData = { ...user };
     delete userWithoutSensitiveData.password;
-    // eliminar todas las propiedades que son sensibles
+
     return userWithoutSensitiveData;
   }
 }

@@ -13,8 +13,7 @@ export class JwtService {
     private readonly configService: ConfigService,
   ) {}
 
-  //TODO => Tal vez conviene crear un único metodo para la
-  //TODO => creacion de access y refresh tokens
+  //TODO => Tal vez conviene crear un único metodo para la creacion de access y refresh tokens
 
   /**
    * Servicio para generar un access token
@@ -23,7 +22,7 @@ export class JwtService {
    */
   async generateAccessToken(payload: IUserPayload) {
     return this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('jwt.accessSecret'), // Acceso desde config
+      secret: this.configService.get<string>('jwt.accessSecret'),
       expiresIn: this.configService.get<string>('jwt.accessTokenExpiration'),
     });
   }
@@ -35,7 +34,7 @@ export class JwtService {
    */
   async generateRefreshToken(payload: IUserPayload) {
     return this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('jwt.refreshSecret'), // Secreto para refresh token
+      secret: this.configService.get<string>('jwt.refreshSecret'),
       expiresIn: this.configService.get<string>('jwt.refreshTokenExpiration'),
     });
   }
@@ -56,5 +55,9 @@ export class JwtService {
    */
   decodeToken(token: string): any {
     return this.jwtService.decode(token);
+  }
+
+  getExpiresIn() {
+    return this.configService.get<string>('jwt.accessTokenExpiration');
   }
 }
