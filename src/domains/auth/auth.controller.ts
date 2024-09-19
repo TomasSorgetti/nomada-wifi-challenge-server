@@ -27,13 +27,13 @@ export class AuthController {
    */
   @Post('login')
   async login(
-    @Body() newUser: LoginUserDto,
+    @Body() loginUserDto: LoginUserDto,
     @Res()
     res: Response,
   ) {
     const { accessToken, refreshToken, user } = await this.authService.login(
-      newUser.email,
-      newUser.password,
+      loginUserDto.email,
+      loginUserDto.password,
     );
     // res.cookie('refreshToken', refreshToken, {
     //   httpOnly: true,
