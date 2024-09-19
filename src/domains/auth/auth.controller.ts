@@ -26,21 +26,17 @@ export class AuthController {
    * @returns
    */
   @Post('login')
-  async login(
-    @Body() loginUserDto: LoginUserDto,
-    @Res()
-    res: Response,
-  ) {
-    const { accessToken, refreshToken, user } = await this.authService.login(
+  async login(@Body() loginUserDto: LoginUserDto) {
+    return await this.authService.login(
       loginUserDto.email,
       loginUserDto.password,
     );
+    //TODO=> la idea era mandar el refresh como httpOnly
     // res.cookie('refreshToken', refreshToken, {
     //   httpOnly: true,
     //   secure: false,
     //   sameSite: 'lax',
     // });
-    return res.status(HttpStatus.OK).json({ accessToken, refreshToken, user });
   }
 
   /**
@@ -72,14 +68,11 @@ export class AuthController {
    * @returns
    */
   @Post('refresh')
-  async refresh(
-    @Body() refreshTokenDto: RefreshTokenDto,
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    return await this.authService.refreshTokens(req.cookies.refreshToken, res);
+  async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
+    return await this.authService.refreshTokens(refreshTokenDto);
   }
 
+  //TODO => Guard no funciona, revisar
   /**
    * Cotrolador para obtener los datos del usuario cuando esta autenticado
    * @param req

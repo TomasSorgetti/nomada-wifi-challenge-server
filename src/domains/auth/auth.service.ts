@@ -8,6 +8,8 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from 'src/common/services/jwt.service';
 import { SensitiveUserService } from 'src/common/services/sensitiveUser.service';
 import { Response } from 'express';
+import { RefreshTokenDto } from './dto/refreshToken.dto';
+import { ILoginResponse } from './interfaces/login.interfaces';
 
 @Injectable()
 export class AuthService {
@@ -24,16 +26,12 @@ export class AuthService {
    * @param password
    * @returns
    */
-  async login(
-    email: string,
-    password: string,
-  ): Promise<{ accessToken: string; refreshToken: string; user: any }> {
-    //* Find user
+  async login(email: string, password: string): Promise<ILoginResponse> {
     const foundUser = await this.userService.getUserByEmail(email);
     if (!foundUser) {
       throw new BadRequestException('User not found');
     }
-    //* Compare password
+
     const isPasswordValid = await this.passwordService.comparePassword(
       password,
       foundUser.password,
@@ -42,7 +40,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
 
-    //* Generate tokens
     const payload = {
       email: foundUser.email,
       sub: foundUser.id,
@@ -53,6 +50,7 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
+      expiresIn: this.jwtService.getExpiresIn(),
       user: this.sensitiveUserService.getUserWithoutSensitiveData(foundUser),
     };
   }
@@ -95,20 +93,24 @@ export class AuthService {
    * @param res
    * @returns
    */
-  async refreshTokens(user: any, res: Response) {
-    const payload = { email: user.email, sub: user.id };
-    const accessToken = this.jwtService.generateAccessToken(payload);
-    const refreshToken = await this.jwtService.generateRefreshToken(payload);
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      //* secure en produccion es true, se debería de cambiar desde el process.env.NODE_ENV === 'production'
-      secure: false,
-      //* sameSite en produccion debería ser strict dependiendo del dominio
-      sameSite: 'lax',
+  async refreshTokens(refreshTokenDto: RefreshTokenDto) {
+    const { sub: userId, email } = this.jwtService.decodeToken(
+      refreshTokenDto.refreshToken,
+    );
+    const accessToken = await this.jwtService.generateAccessToken({
+      sub: userId,
+      email,
+    });
+    const refreshToken = await this.jwtService.generateRefreshToken({
+      sub: userId,
+      email,
     });
 
-    return { accessToken };
+    return {
+      accessToken,
+      expiresIn: this.jwtService.getExpiresIn(),
+      refreshToken,
+    };
   }
 
   /**
@@ -119,6 +121,9 @@ export class AuthService {
   async me(user: { id: number }) {
     //* Buscar por id es más rápido que buscar por email
     const foundUser = await this.userService.getUserByPk(user.id);
+    if (!foundUser) {
+      throw new BadRequestException('User not found');
+    }
     return this.sensitiveUserService.getUserWithoutSensitiveData(foundUser);
   }
 }
