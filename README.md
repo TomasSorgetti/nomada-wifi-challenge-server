@@ -53,6 +53,10 @@ Levanta el proyecto (puerto 8080)
 npm run start:dev
 ```
 
+Seguí las indicaciónes del frontend para que funcione la aplicación completa.
+
+[Repositorio del Frontend](https://github.com/TomasSorgetti/nomada-wifi-challenge-front)
+
 ## Arquitectura del Backend
 
 ```bash
@@ -62,14 +66,14 @@ npm run start:dev
     │       ├── jwt.service.ts
     │       ├── password.service.ts
     │       └── sensitiveUser.service.ts
-    │       
+    │
     ├── config/                                     #carpeta para las configuraciónes de variables
     │   ├── database.config.ts
     │   └── jwt.config.ts
-    │   
+    │
     ├── database/
     │   └── database.module.ts                      #config de la database
-    │   
+    │
     ├── domains/                                    #carpeta que contiene los dominios
     │   ├── auth/                                       #dominio de autenticación
     │   │   ├── dto/
