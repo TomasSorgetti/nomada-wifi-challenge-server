@@ -29,7 +29,7 @@ export class AuthService {
   async login(email: string, password: string): Promise<ILoginResponse> {
     const foundUser = await this.userService.getUserByEmail(email);
 
-    if (foundUser?.deletedAt !== null) {
+    if (foundUser && foundUser?.deletedAt !== null) {
       throw new BadRequestException('User was deleted');
     }
     if (!foundUser) {
@@ -67,11 +67,14 @@ export class AuthService {
    */
   async register(email: string, password: string) {
     const foundUser = await this.userService.getUserByEmail(email);
-    if (foundUser || foundUser?.deletedAt !== null) {
+
+    if (foundUser && foundUser.deletedAt !== null) {
+      throw new BadRequestException('User was deleted');
+    } else if (foundUser) {
       throw new BadRequestException('User already exists');
     }
-    const hashedPassword = await this.passwordService.hashPassword(password);
 
+    const hashedPassword = await this.passwordService.hashPassword(password);
     const user = await this.userService.createUser(email, hashedPassword);
     return this.sensitiveUserService.getUserWithoutSensitiveData(user);
   }
@@ -122,9 +125,9 @@ export class AuthService {
    * @param user
    * @returns
    */
-  async me(user: { id: number }) {
+  async me(id: number) {
     //* Buscar por id es más rápido que buscar por email
-    const foundUser = await this.userService.getUserByPk(user.id);
+    const foundUser = await this.userService.getUserByPk(id);
     if (!foundUser) {
       throw new BadRequestException('User not found');
     }
