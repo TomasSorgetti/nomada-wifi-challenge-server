@@ -22,6 +22,6 @@ export class UsersController {
   @Delete()
   @UseGuards(JwtAuthGuard)
   async deletUser(@Request() req, @Body() { password }: { password: string }) {
-    return this.usersService.deletUser(req.user.id, password);
+    return this.usersService.deletUser(req.user.sub, password);
   }
 }
