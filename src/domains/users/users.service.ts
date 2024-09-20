@@ -23,6 +23,7 @@ export class UsersService {
   getUserByEmail(email: string) {
     return this.usersRepository.findOne({
       where: { email },
+      withDeleted: true,
     });
   }
 

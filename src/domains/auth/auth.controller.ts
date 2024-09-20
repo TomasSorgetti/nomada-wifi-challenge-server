@@ -86,7 +86,6 @@ export class AuthController {
     @Req()
     req,
   ) {
-    return this.authService.me(req.user);
+    return this.authService.me(req.user.sub);
   }
-
 }
