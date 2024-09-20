@@ -66,7 +66,7 @@ export class RolesService implements OnModuleInit {
    * Servicio para actualizar un rol - NO IMPLEMENTADO
    * @returns
    */
-  updateRole() {
+  updateRole(id: number) {
     return 'NOT_IMPLEMENTED';
   }
 
@@ -74,7 +74,7 @@ export class RolesService implements OnModuleInit {
    * Servicio para eliminar un rol - NO IMPLEMENTADO
    * @returns
    */
-  deleteRole() {
+  deleteRole(id: number) {
     return 'NOT_IMPLEMENTED';
   }
 }

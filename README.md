@@ -40,14 +40,14 @@ DB_SYNCHRONIZE=true
 
 Creá una base de datos en mysql con el mismo nombre que en el .env (DB_DATABASE)
 
-```bash
+```sql
 
 mysql -u tu_usuario -p
 CREATE DATABASE tu_db_name;
 
 ```
 
-Levanta el proyecto en el puerto 8080
+Levanta el proyecto (puerto 8080)
 
 ```bash
 npm run start:dev

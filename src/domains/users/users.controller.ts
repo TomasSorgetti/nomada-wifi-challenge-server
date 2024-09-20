@@ -7,19 +7,21 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  //TODO=> protected route
   @Get()
   getUsers() {
     return this.usersService.getUsers();
   }
 
-  @Delete('')
-  //TODO debería de usar un guard?
-  async deletUser(@Body() email: string, password: string) {
-    return this.usersService.deletUser(email, password);
+  @Delete()
+  @UseGuards(JwtAuthGuard)
+  async deletUser(@Request() req, @Body() { password }: { password: string }) {
+    return this.usersService.deletUser(req.user.id, password);
   }
 }
