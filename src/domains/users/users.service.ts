@@ -32,7 +32,7 @@ export class UsersService {
    * @returns
    */
   getUserByPk(id: number) {
-    return this.usersRepository.findOne({ where: { id, deletedAt: null } });
+    return this.usersRepository.findOne({ where: { id } });
   }
 
   /**
@@ -62,7 +62,6 @@ export class UsersService {
     });
   }
 
-  //TODO => Terminar ruta, no funciona
   /**
    * Elimina de manera Soft a un usuario
    * @param email
@@ -71,6 +70,11 @@ export class UsersService {
    */
   async deletUser(sub: number, password: string) {
     const userFound = await this.getUserByPk(sub);
+
+    if (userFound.deletedAt !== null) {
+      throw new BadRequestException('User already deleted');
+    }
+
     if (!userFound) {
       throw new BadRequestException('User not found');
     }
@@ -82,7 +86,7 @@ export class UsersService {
       throw new BadRequestException('Invalid password');
     }
     userFound.deletedAt = new Date();
-    const deletedUser = await this.usersRepository.save(userFound);
+    await this.usersRepository.save(userFound);
 
     return {
       message: 'User deleted successfully',
