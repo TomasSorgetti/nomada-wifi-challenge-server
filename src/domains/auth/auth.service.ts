@@ -28,7 +28,11 @@ export class AuthService {
    */
   async login(email: string, password: string): Promise<ILoginResponse> {
     const foundUser = await this.userService.getUserByEmail(email);
-    if (!foundUser || foundUser?.deletedAt !== null) {
+
+    if (foundUser?.deletedAt !== null) {
+      throw new BadRequestException('User was deleted');
+    }
+    if (!foundUser) {
       throw new BadRequestException('User not found');
     }
 
