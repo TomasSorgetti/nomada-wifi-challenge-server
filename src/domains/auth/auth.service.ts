@@ -28,7 +28,7 @@ export class AuthService {
    */
   async login(email: string, password: string): Promise<ILoginResponse> {
     const foundUser = await this.userService.getUserByEmail(email);
-    if (!foundUser) {
+    if (!foundUser || foundUser?.deletedAt !== null) {
       throw new BadRequestException('User not found');
     }
 
@@ -63,8 +63,8 @@ export class AuthService {
    */
   async register(email: string, password: string) {
     const foundUser = await this.userService.getUserByEmail(email);
-    if (foundUser) {
-      throw new BadRequestException('This email already exists');
+    if (foundUser || foundUser?.deletedAt !== null) {
+      throw new BadRequestException('User already exists');
     }
     const hashedPassword = await this.passwordService.hashPassword(password);
 

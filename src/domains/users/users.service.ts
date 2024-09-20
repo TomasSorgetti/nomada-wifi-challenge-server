@@ -4,6 +4,7 @@ import { User } from './entities/users.entity';
 import { Repository } from 'typeorm';
 import { RolesService } from '../roles/roles.service';
 import { PasswordService } from 'src/common/services/password.service';
+import { IJwtUser } from '../auth/interfaces/jwtResponse.interfaces';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +21,9 @@ export class UsersService {
    * @returns
    */
   getUserByEmail(email: string) {
-    return this.usersRepository.findOne({ where: { email, deletedAt: null } });
+    return this.usersRepository.findOne({
+      where: { email },
+    });
   }
 
   /**
@@ -66,18 +69,23 @@ export class UsersService {
    * @param password
    * @returns
    */
-  async deletUser(email: string, password: string) {
-    const user = await this.getUserByEmail(email);
-    if (!user) {
+  async deletUser(sub: number, password: string) {
+    const userFound = await this.getUserByPk(sub);
+    if (!userFound) {
       throw new BadRequestException('User not found');
     }
     const verifyPassword = await this.passwordService.comparePassword(
       password,
-      user.password,
+      userFound.password,
     );
     if (!verifyPassword) {
       throw new BadRequestException('Invalid password');
     }
-    return await this.usersRepository.softRemove(user);
+    userFound.deletedAt = new Date();
+    const deletedUser = await this.usersRepository.save(userFound);
+
+    return {
+      message: 'User deleted successfully',
+    };
   }
 }

@@ -61,6 +61,8 @@ export class AuthController {
     res.status(HttpStatus.OK).json(response);
   }
 
+  //TODO => Hacer una strategy para el refresh token?
+
   /**
    * Controlador para refrescar el refreshToken
    * @param refreshTokenDto
@@ -73,7 +75,6 @@ export class AuthController {
     return await this.authService.refreshTokens(refreshTokenDto);
   }
 
-  //TODO => Guard no funciona, revisar
   /**
    * Cotrolador para obtener los datos del usuario cuando esta autenticado
    * @param req
@@ -85,10 +86,7 @@ export class AuthController {
     @Req()
     req,
   ) {
-    console.log('REQUEST ME!!!!!', req);
-
     return this.authService.me(req.user);
   }
 
-  //TODO => debería de hacer el delete en auth o users
 }
