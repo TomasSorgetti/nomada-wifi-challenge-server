@@ -3,7 +3,7 @@
 Cloná el repositorio en tu carpeta:
 
 ```bash
-git clone https://github.com/TomasSorgetti/todosgamers-challenge-server.git
+git clone https://github.com/TomasSorgetti/nomada-wifi-challenge-server.git
 ```
 
 Entrá en la carpeta del proyecto e instalá las dependencias
