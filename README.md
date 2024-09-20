@@ -9,7 +9,7 @@ git clone https://github.com/TomasSorgetti/nomada-wifi-challenge-server.git
 Entrá en la carpeta del proyecto e instalá las dependencias
 
 ```bash
-cd todosgamers-challenge-server
+cd nomada-wifi-challenge-server
 npm install
 ```
 
